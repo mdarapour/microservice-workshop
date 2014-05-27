@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.activation.DataSource;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -36,30 +33,10 @@ public class MessageDescriptor {
         this.setSubject(builder.subject);
         this.to = builder.to.clone();
         this.from = builder.from;
-        this.cc = builder.cc.map(new Function<String[], String[]>() {
-            @Override
-            public String[] apply(String[] strings) {
-                return strings.clone();
-            }
-        });
-        this.bcc = builder.bcc.map(new Function<String[], String[]>() {
-            @Override
-            public String[] apply(String[] strings) {
-                return strings.clone();
-            }
-        });
-        this.customHeaders = builder.customHeaders.map(new Function<Map<String, String>, Map<String, String>>() {
-            @Override
-            public Map<String, String> apply(Map<String, String> stringStringMap) {
-                return Collections.unmodifiableMap(stringStringMap);
-            }
-        });
-        this.attachments = builder.attachments.map(new Function<Map<String, DataSource>, Map<String, DataSource>>() {
-            @Override
-            public Map<String, DataSource> apply(Map<String, DataSource> stringDataSourceMap) {
-                return Collections.unmodifiableMap(stringDataSourceMap);
-            }
-        });
+        this.cc = builder.cc.map(strings -> strings.clone());
+        this.bcc = builder.bcc.map(strings -> strings.clone());
+        this.customHeaders = builder.customHeaders.map(stringStringMap -> Collections.unmodifiableMap(stringStringMap));
+        this.attachments = builder.attachments.map(stringDataSourceMap -> Collections.unmodifiableMap(stringDataSourceMap));
     }
 
     public String getSubject() {
@@ -67,12 +44,8 @@ public class MessageDescriptor {
     }
 
     public void setSubject(String subject) {
-        if (subject == null) {
-            this.subject = "";
-        } else {
-            this.subject = subject.replaceAll("[\n\r]","").trim();
-        }
-
+        this.subject = Strings.nullToEmpty(subject);
+        this.subject = subject.replaceAll("[\n\r]","").trim();
     }
 
     public String getFrom() {
@@ -132,12 +105,7 @@ public class MessageDescriptor {
     public void removeCustomHeader(String name) {
         Objects.requireNonNull(name);
         checkArgument(!name.startsWith(CUSTOM_HEADER_PREFIX), "Custom headers have to start with 'X-'");
-        customHeaders.ifPresent(new Consumer<Map<String, String>>() {
-            @Override
-            public void accept(Map<String, String> stringStringMap) {
-                stringStringMap.remove(name);
-            }
-        });
+        customHeaders.ifPresent(strings -> strings.remove(name));
     }
 
     public boolean hasCustomHeader(String customHeader) {
@@ -208,12 +176,7 @@ public class MessageDescriptor {
         }
 
         public Builder attachments(Map<String, DataSource> attachments) {
-            attachments.entrySet().stream().forEach(new Consumer<Map.Entry<String, DataSource>>() {
-                @Override
-                public void accept(Map.Entry<String, DataSource> entry) {
-                    attachment(entry.getKey(), entry.getValue());
-                }
-            });
+            attachments.entrySet().stream().forEach(entry -> attachment(entry.getKey(), entry.getValue()));
             return this;
         }
 

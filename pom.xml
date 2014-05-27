@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j-version>1.7.6</slf4j-version>
         <reactor-version>1.1.0.RELEASE</reactor-version>
-        <google-guava-version>14.0.1</google-guava-version>
+        <google-guava-version>17.0</google-guava-version>
         <javax-mail-version>1.4.1</javax-mail-version>
     </properties>
 

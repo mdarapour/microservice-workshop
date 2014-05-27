@@ -24,7 +24,6 @@ public class MailServer {
 
     private final BlockingQueue<MessageDescriptor> messages = new LinkedTransferQueue<>();
     private final AtomicBoolean active = new AtomicBoolean(true);
-    private final TemplateParser parser;
 
     private static final Random   RANDOM  = new Random();
     private static final String   CHARS   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
