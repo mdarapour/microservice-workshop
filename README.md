@@ -1,4 +1,6 @@
 microservice-workshop
 =====================
 
-A sample implementation of Microservice architecture based on Spring Framework
+A sample project based on Spring Framework to experience Microservice architecture.
+
+UNDER CONSTRUCTION
