@@ -1,4 +1,4 @@
-package com.mdarapour.ms.workshop.model;
+package com.mdarapour.ms.workshop.domain;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;

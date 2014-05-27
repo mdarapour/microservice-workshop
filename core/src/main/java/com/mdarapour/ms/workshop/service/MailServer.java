@@ -8,13 +8,18 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.mdarapour.ms.workshop.model.MessageDescriptor;
+import com.mdarapour.ms.workshop.domain.MessageDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import javax.activation.DataSource;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
+
 
 /**
  * Created by mdarapour on 23/05/14.
@@ -24,6 +29,7 @@ public class MailServer {
 
     private final BlockingQueue<MessageDescriptor> messages = new LinkedTransferQueue<>();
     private final AtomicBoolean active = new AtomicBoolean(true);
+    private final JavaMailSender mailer = new JavaMailSenderImpl();
 
     private static final Random   RANDOM  = new Random();
     private static final String   CHARS   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -60,34 +66,37 @@ public class MailServer {
     }
 
     public MimeMessage execute(MessageDescriptor incoming) {
-        String payload = templateParser.parse(descriptor.getTemplateDefinition().getFilename(),descriptor.getLocale(),
-                descriptor.getModel());
-        MimeMessage message = mailSender.createMimeMessage();
-        boolean isMultipartMessage = descriptor.getAttachments() != null && descriptor.getAttachments().size() > 0;
-        MimeMessageHelper helper = new MimeMessageHelper(message, isMultipartMessage, "UTF-8");
+        MimeMessage message = mailer.createMimeMessage();
+        boolean isMultipartMessage = incoming.getAttachments() != null && incoming.getAttachments().size() > 0;
+        MimeMessageHelper helper = null;
+        try {
+            helper = new MimeMessageHelper(message, isMultipartMessage, "UTF-8");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
 
         // default from is specified through Spring configuration, overwrite it only if necessary
-        if (descriptor.getFrom() != null)
-            helper.setFrom(descriptor.getFrom());
+        if (incoming.getFrom() != null)
+            helper.setFrom(incoming.getFrom());
         else
             helper.setFrom(defaultFrom);
 
-        helper.setTo(descriptor.getTo());
-        if (descriptor.getCc() != null) {
-            helper.setCc(descriptor.getCc());
+        helper.setTo(incoming.getTo());
+        if (incoming.getCc() != null) {
+            helper.setCc(incoming.getCc());
         }
-        if (descriptor.getBcc() != null) {
-            helper.setBcc(descriptor.getBcc());
+        if (incoming.getBcc() != null) {
+            helper.setBcc(incoming.getBcc());
         }
-        if (descriptor.getSubject() != null) {
-            helper.setSubject(descriptor.getSubject());
+        if (incoming.getSubject() != null) {
+            helper.setSubject(incoming.getSubject());
         }
-        if (descriptor.getReplyTo() != null) {
-            helper.setReplyTo(descriptor.getReplyTo());
+        if (incoming.getReplyTo() != null) {
+            helper.setReplyTo(incoming.getReplyTo());
         }
 
-        for (String customHeader : descriptor.getCustomHeaders().keySet()) {
-            String val = descriptor.getCustomHeader(customHeader);
+        for (String customHeader : incoming.getCustomHeaders().keySet()) {
+            String val = incoming.getCustomHeader(customHeader);
             // encode text to make it charset aware
             try {
                 val = MimeUtility.encodeText(val);
@@ -98,13 +107,13 @@ public class MailServer {
         }
 
         if (isMultipartMessage) {
-            Set<Map.Entry<String, DataSource>> attachments = descriptor.getAttachments().entrySet();
+            Set<Map.Entry<String, DataSource>> attachments = incoming.getAttachments().entrySet();
             for (Map.Entry<String, DataSource> attachment : attachments) {
                 helper.addAttachment(attachment.getKey(), attachment.getValue());
             }
         }
         // the true flag indicates that the included text is html
-        helper.setText(payload, descriptor.getTemplateDefinition().isHtml());
+        helper.setText(payload, incoming.getTemplateDefinition().isHtml());
 
         message.saveChanges();
         return message;

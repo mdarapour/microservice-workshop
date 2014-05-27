@@ -1,6 +1,6 @@
 package com.darapour.ms.workshop;
 
-import com.mdarapour.ms.workshop.model.MessageDescriptor;
+import com.mdarapour.ms.workshop.domain.MessageDescriptor;
 import com.mdarapour.ms.workshop.service.MailServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
