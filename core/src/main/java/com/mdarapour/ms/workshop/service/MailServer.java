@@ -79,7 +79,7 @@ public class MailServer {
     }
 
     public MessageDescriptor nextMail() {
-        return null;//new MessageDescriptor.Builder.(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)]);
+        return new MessageDescriptor.Builder(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)], SYMBOLS[RANDOM.nextInt(SYMBOLS.length)]).build();
     }
 
     public void stop() {
