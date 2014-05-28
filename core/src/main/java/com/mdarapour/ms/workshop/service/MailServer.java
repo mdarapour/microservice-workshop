@@ -1,17 +1,5 @@
 package com.mdarapour.ms.workshop.service;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import com.mdarapour.ms.workshop.domain.MessageDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +11,16 @@ import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 
 /**
@@ -37,6 +35,7 @@ public class MailServer {
 
     private static final Random   RANDOM  = new Random();
     private static final String   CHARS   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String   DOMAIN  = "@DOMAIN.COM";
     private static final String[] SYMBOLS = new String[1000];
     private static final int      LEN     = CHARS.length();
 
@@ -79,7 +78,9 @@ public class MailServer {
     }
 
     public MessageDescriptor nextMail() {
-        return new MessageDescriptor.Builder(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)], SYMBOLS[RANDOM.nextInt(SYMBOLS.length)]).build();
+        return new MessageDescriptor.Builder(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)].concat(DOMAIN),
+                SYMBOLS[RANDOM.nextInt(SYMBOLS.length)],
+                SYMBOLS[RANDOM.nextInt(SYMBOLS.length)].concat(DOMAIN)).build();
     }
 
     public void stop() {
@@ -104,16 +105,19 @@ public class MailServer {
             helper.setSubject(incoming.getSubject());
         }
 
-        for (String customHeader : incoming.getCustomHeaders().keySet()) {
-            String val = incoming.getCustomHeader(customHeader);
-            // encode text to make it charset aware
-            try {
-                val = MimeUtility.encodeText(val);
-            } catch (UnsupportedEncodingException e) {
-                LOG.error("Could not encode Mail header Field " + customHeader + ": " + val, e);
-            }
-            message.addHeader(customHeader, val);
-        }
+        if(!Objects.isNull(incoming.getCustomHeaders()))
+            incoming.getCustomHeaders().forEach((key, value) -> {
+                try {
+                    value = MimeUtility.encodeText(value);
+                } catch (UnsupportedEncodingException e) {
+                    LOG.error("Could not encode Mail header Field " + key + ": " + value, e);
+                }
+                try {
+                    message.addHeader(key, value);
+                } catch (MessagingException e) {
+                    LOG.error("Could not map Mail header Field " + key + ": " + value, e);
+                }
+            });
 
         if (isMultipartMessage) {
             Set<Map.Entry<String, DataSource>> attachments = incoming.getAttachments().entrySet();

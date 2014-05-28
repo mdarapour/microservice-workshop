@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Created by mdarapour on 23/05/14.
  */
 public class MessageDescriptor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageDescriptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageDescriptor.class);
 
     private static final String CUSTOM_HEADER_PREFIX="X-";
     private String subject;
@@ -107,7 +107,7 @@ public class MessageDescriptor {
 
     public String getCustomHeader(String name) {
         if (!name.startsWith(CUSTOM_HEADER_PREFIX)) {
-            LOGGER.warn("Trying to get a custom header without a 'X-' prefix: {}", name);
+            LOG.warn("Trying to get a custom header without a 'X-' prefix: {}", name);
         }
         return customHeaders.isPresent() ? customHeaders.get().get(name) : null;
     }
@@ -120,7 +120,7 @@ public class MessageDescriptor {
 
     public boolean hasCustomHeader(String customHeader) {
         if (!customHeader.startsWith(CUSTOM_HEADER_PREFIX)) {
-            LOGGER.warn("Trying to check a custom header without a 'X-' prefix: {}", customHeader);
+            LOG.warn("Trying to check a custom header without a 'X-' prefix: {}", customHeader);
         }
         return customHeaders.isPresent() ? customHeaders.get().containsKey(customHeader) : false;
     }
@@ -147,22 +147,24 @@ public class MessageDescriptor {
         private final String subject;
         private final String[] to;
         private String from;
-        private Optional<String> body;
-        private Optional<String[]> cc;
-        private Optional<String[]> bcc;
+        private Optional<String> body = Optional.empty();
+        private Optional<String[]> cc = Optional.empty();;
+        private Optional<String[]> bcc = Optional.empty();;
         private Optional<Map<String,String>> customHeaders = Optional.empty();
         private Optional<Map<String, DataSource>> attachments = Optional.empty();
 
-        public Builder(String subject, String to) {
-            this(subject, new String[] {to});
+        public Builder(String subject, String to, String from) {
+            this(subject, new String[] {to}, from);
         }
 
 
-        public Builder(String subject, String[] to) {
-            checkArgument(Strings.isNullOrEmpty(subject));
+        public Builder(String subject, String[] to, String from) {
+            LOG.info("Creating a message from ["+subject+"] & ["+to+"]");
+            checkArgument(!Strings.isNullOrEmpty(subject));
             checkArgument(Objects.nonNull(to) && to.length > 0);
             this.subject = subject.trim();
             this.to = to.clone();
+            this.from = from;
         }
 
         public Builder from(String from) {
