@@ -2,12 +2,16 @@ package com.mdarapour.ms.workshop.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import com.mdarapour.ms.workshop.domain.MessageDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,22 +70,30 @@ public class MailServer {
     }
 
     public MimeMessage execute(MessageDescriptor incoming) {
+        try {
+            return create(incoming);
+        } catch (MessagingException e) {
+            LOG.error("Could not convert incoming message", e);
+            return null;
+        }
+    }
+
+    public MessageDescriptor nextMail() {
+        return null;//new MessageDescriptor.Builder.(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)]);
+    }
+
+    public void stop() {
+        this.active.set(false);
+    }
+
+    private MimeMessage create(MessageDescriptor incoming) throws MessagingException {
         MimeMessage message = mailer.createMimeMessage();
         boolean isMultipartMessage = incoming.getAttachments() != null && incoming.getAttachments().size() > 0;
-        MimeMessageHelper helper = null;
-        try {
-            helper = new MimeMessageHelper(message, isMultipartMessage, "UTF-8");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+        MimeMessageHelper helper = new MimeMessageHelper(message, isMultipartMessage, "UTF-8");
 
-        // default from is specified through Spring configuration, overwrite it only if necessary
-        if (incoming.getFrom() != null)
-            helper.setFrom(incoming.getFrom());
-        else
-            helper.setFrom(defaultFrom);
-
+        helper.setFrom(incoming.getFrom());
         helper.setTo(incoming.getTo());
+        // TODO update these
         if (incoming.getCc() != null) {
             helper.setCc(incoming.getCc());
         }
@@ -91,9 +103,6 @@ public class MailServer {
         if (incoming.getSubject() != null) {
             helper.setSubject(incoming.getSubject());
         }
-        if (incoming.getReplyTo() != null) {
-            helper.setReplyTo(incoming.getReplyTo());
-        }
 
         for (String customHeader : incoming.getCustomHeaders().keySet()) {
             String val = incoming.getCustomHeader(customHeader);
@@ -101,7 +110,7 @@ public class MailServer {
             try {
                 val = MimeUtility.encodeText(val);
             } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Could not encode Mail header Field " + customHeader + ": " + val, e);
+                LOG.error("Could not encode Mail header Field " + customHeader + ": " + val, e);
             }
             message.addHeader(customHeader, val);
         }
@@ -113,17 +122,9 @@ public class MailServer {
             }
         }
         // the true flag indicates that the included text is html
-        helper.setText(payload, incoming.getTemplateDefinition().isHtml());
+        helper.setText(incoming.getPayload());
 
         message.saveChanges();
         return message;
-    }
-
-    public MessageDescriptor nextMail() {
-        return null;//new MessageDescriptor.Builder.(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)]);
-    }
-
-    public void stop() {
-        this.active.set(false);
     }
 }

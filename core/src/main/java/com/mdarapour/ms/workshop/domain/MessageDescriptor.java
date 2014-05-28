@@ -24,6 +24,7 @@ public class MessageDescriptor {
     private Optional<String[]> bcc;
     private Optional<Map<String,String>> customHeaders;
     private Optional<Map<String, DataSource>> attachments;
+    private String payload;
 
     public MessageDescriptor() {
         customHeaders = Optional.of(Maps.newHashMap());
@@ -35,6 +36,7 @@ public class MessageDescriptor {
         this.from = builder.from;
         this.cc = builder.cc.map(strings -> strings.clone());
         this.bcc = builder.bcc.map(strings -> strings.clone());
+        this.payload = builder.body.orElse(null);
         this.customHeaders = builder.customHeaders.map(stringStringMap -> Collections.unmodifiableMap(stringStringMap));
         this.attachments = builder.attachments.map(stringDataSourceMap -> Collections.unmodifiableMap(stringDataSourceMap));
     }
@@ -88,6 +90,14 @@ public class MessageDescriptor {
         attachments.orElse(Maps.newHashMap()).put(name, dataSource);
     }
 
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
+
     public void setCustomHeader(String name, String value) {
         Objects.requireNonNull(name);
         Objects.requireNonNull(value);
@@ -129,6 +139,7 @@ public class MessageDescriptor {
                 ", bcc=" + (bcc.orElse(null)) +
                 ", customHeaders=" + customHeaders +
                 ", attachments=" + attachments +
+                ", body=" + payload +
                 '}';
     }
 
@@ -136,6 +147,7 @@ public class MessageDescriptor {
         private final String subject;
         private final String[] to;
         private String from;
+        private Optional<String> body;
         private Optional<String[]> cc;
         private Optional<String[]> bcc;
         private Optional<Map<String,String>> customHeaders = Optional.empty();
@@ -188,6 +200,10 @@ public class MessageDescriptor {
             return this;
         }
 
+        public Builder body(String body) {
+            this.body = Optional.ofNullable(body);
+            return this;
+        }
 
         public Builder customHeaders(Map<String, String> headers) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
