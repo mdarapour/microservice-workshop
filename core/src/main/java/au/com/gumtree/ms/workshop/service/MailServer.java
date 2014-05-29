@@ -13,10 +13,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
-import static au.com.gumtree.ms.workshop.util.MessageGenerator.ifSet;
+import static au.com.gumtree.ms.workshop.util.MessageGenerator.ifThen;
 
 
 /**
@@ -63,21 +61,21 @@ public class MailServer {
 
         helper.setFrom(incoming.getFrom());
         helper.setTo(incoming.getTo());
-        ifSet(incoming, in -> in.getCc() != null, in -> {
+        ifThen(incoming, in -> in.getCc() != null, in -> {
             try {
                 helper.setCc(in.getCc());
             } catch (MessagingException e) {
                 LOG.error("Could not set message CC", e);
             }
         });
-        ifSet(incoming, in -> in.getBcc() != null, in -> {
+        ifThen(incoming, in -> in.getBcc() != null, in -> {
             try {
                 helper.setCc(in.getBcc());
             } catch (MessagingException e) {
                 LOG.error("Could not set message CC", e);
             }
         });
-        ifSet(incoming, in -> in.getSubject() != null, in -> {
+        ifThen(incoming, in -> in.getSubject() != null, in -> {
             try {
                 helper.setSubject(in.getSubject());
             } catch (MessagingException e) {

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,6 @@ import reactor.core.Reactor;
 import reactor.core.spec.Reactors;
 import reactor.event.Event;
 import reactor.spring.context.config.EnableReactor;
-
-import java.util.concurrent.CountDownLatch;
 import static reactor.event.selector.Selectors.$;
 
 /**
@@ -23,6 +22,7 @@ import static reactor.event.selector.Selectors.$;
  */
 @Configuration
 @EnableAutoConfiguration
+@ConfigurationProperties
 @ComponentScan
 @EnableReactor
 public class BootMailServer {
@@ -45,12 +45,7 @@ public class BootMailServer {
         return r;
     }
 
-    @Bean
-    public CountDownLatch closeLatch() {
-        return new CountDownLatch(1);
-    }
-
-    public static void main(String... args) {
+    public static void main(String... args) throws InterruptedException {
         SpringApplication.run(BootMailServer.class, args);
     }
 }

@@ -91,7 +91,7 @@ public class MessageDescriptor {
 
 
         public Builder(String subject, String[] to, String from, String body) {
-            LOG.debug("Creating a message from [" + subject + "] & [" + to + "]");
+            LOG.info("Creating a message from [{}] & [{}]", subject, to);
             Preconditions.checkArgument(!Strings.isNullOrEmpty(subject));
             Preconditions.checkArgument(Objects.nonNull(to) && to.length > 0);
             this.subject = subject.trim();

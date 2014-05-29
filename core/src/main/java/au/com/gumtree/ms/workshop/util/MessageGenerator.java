@@ -50,7 +50,7 @@ public class MessageGenerator {
         return SYMBOLS[RANDOM.nextInt(SYMBOLS.length)];
     }
 
-    public static <T> void ifSet(T t, Predicate<T> predicate, Consumer<T> consumer) throws MessagingException {
+    public static <T> void ifThen(T t, Predicate<T> predicate, Consumer<T> consumer) throws MessagingException {
         if(predicate.test(t))
             consumer.accept(t);
     }
