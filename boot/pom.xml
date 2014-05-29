@@ -36,6 +36,10 @@
             <artifactId>reactor-spring-context</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.projectreactor</groupId>
+            <artifactId>reactor-net</artifactId>
+        </dependency>
+        <dependency>
             <groupId>au.com.gumtree.workout.spring</groupId>
             <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>

@@ -63,7 +63,6 @@ public class MailServer {
 
         helper.setFrom(incoming.getFrom());
         helper.setTo(incoming.getTo());
-        // TODO update these
         ifSet(incoming, in -> in.getCc() != null, in -> {
             try {
                 helper.setCc(in.getCc());

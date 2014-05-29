@@ -3,7 +3,6 @@ package au.com.gumtree.ms.workshop.web;
 import au.com.gumtree.ms.workshop.domain.MessageDescriptor;
 import au.com.gumtree.ms.workshop.domain.User;
 import au.com.gumtree.ms.workshop.repository.UserRepository;
-import au.com.gumtree.ms.workshop.service.MailServer;
 import au.com.gumtree.ms.workshop.util.MessageGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ public class MailController {
 
     @Autowired
     public MailController(UserRepository users,
-                           Reactor reactor) {
+                          Reactor reactor) {
         this.users = users;
         this.reactor = reactor;
     }

@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * @author mdarapour
  */
 public class MessageGenerator {
-    private static final Random RANDOM  = new Random();
+    private static final Random   RANDOM  = new Random();
     private static final String   CHARS   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String   DOMAIN  = "@DOMAIN.COM";
     private static final String[] SYMBOLS = new String[1000];
