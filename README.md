@@ -22,5 +22,3 @@
     Step 6 : BootMailServer
 ##Topic 5 : Pros & Cons
     * Microservice Group
-    
-URL : https://github.com/spring-guides/gs-reactor-thumbnailer.git
