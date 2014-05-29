@@ -22,3 +22,12 @@
     Step 6 : BootMailServer
 ##Topic 5 : Pros & Cons
     * Microservice Group
+    
+#API
+```
+curl -X GET -H "Content-Type: application/json" http://localhost:8080
+curl -X POST -H "Content-Type: application/json" http://localhost:8080/user -d '{"id":2,"mail":"mail2@ebay.com","messageCount":0}'
+curl -X GET -H "Content-Type: application/json" http://localhost:8080/user/1
+curl -X DELETE -H "Content-Type: application/json" http://localhost:8080/user/1
+curl -X PUT -H "Content-Type: application/json" http://localhost:8080/user/1/to/buyer@email.com/hi/hello
+```
