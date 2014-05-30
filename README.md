@@ -9,8 +9,8 @@
     * What is it?
     * How can it help?
 ##Topic 3 : Demo 1 (Echo service) 
-    Step 1 : PUT
-    Step 2 : GET
+    Step 1 : GET
+    Step 2 : PUT
     Step 3 : POST
     Step 4 : DELETE
 ##Topic 4 : Demo 2 (Mail Service)
