@@ -11,29 +11,35 @@
 ##Topic 3 : Demo 1 (Echo service) 
     Step 1 : GET
     Step 2 : POST
+    Step 3 : DELETE
 
 
 ###Step 1 : update the controller class 
 
 <pre>
-    @RequestMapping(value = "/user", method = RequestMethod.POST, produces = "text/plain")
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE, produces = "text/plain")
     @ResponseBody
-    public String add(@RequestBody User user) {
-        // Save user
-        User updated = users.save(user);
+    public String delete(@PathVariable Long id) {
+        // Retrieve user by id
+        User user = users.findOne(id);
+        if(Objects.isNull(user))
+            return "User id '"+id+"' not found.";
+
+        // Delete user
+        users.delete(user);
 
         // Return result
-        return "User " + updated.getMail() + " has been registered.";
+        return "User " + user.getMail() + " has been deleted.";
     }
 </pre>
 
 ###Step 2 : start the boot app
-###Step 3 : create a new user
+###Step 3 : delete a new user
 <pre>
-curl -X POST -H "Content-Type: application/json" http://localhost:8080/user -d '{"id":2,"mail":"mail2@ebay.com"}'
+curl -X DELETE -H "Content-Type: application/json" http://localhost:8080/user/1
 </pre>
 
-###Step 4 : retrieve the user
+###Step 4 : retrieve the deleted user
 <pre>
-curl -X GET -H "Content-Type: application/json" http://localhost:8080/user/2
+curl -X GET -H "Content-Type: application/json" http://localhost:8080/user/1
 </pre>
