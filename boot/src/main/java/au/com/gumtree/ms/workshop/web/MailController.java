@@ -1,5 +1,8 @@
 package au.com.gumtree.ms.workshop.web;
 
+import au.com.gumtree.ms.workshop.domain.User;
+import au.com.gumtree.ms.workshop.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -7,10 +10,18 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class MailController {
+    private final UserRepository users;
 
-    @RequestMapping(value = "/hi/{name}", method = RequestMethod.GET, produces = "text/plain")
+    @Autowired
+    public MailController(UserRepository users) {
+        this.users = users;
+    }
+
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String get(@PathVariable String name) {
-        return String.format("Hi %s!",name);
+    public User get(@PathVariable Long id) {
+        // Retrieve user by id
+        return users.findOne(id);
     }
 }
