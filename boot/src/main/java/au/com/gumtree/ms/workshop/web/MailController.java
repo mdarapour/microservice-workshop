@@ -26,6 +26,11 @@ public class MailController {
         this.reactor = reactor;
     }
 
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public Iterable<User> list() {
+        return users.findAll();
+    }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -39,6 +44,16 @@ public class MailController {
     public String add(@RequestBody User user) {
         // Save user
         User updated = users.save(user);
+
+        // Send registration notification
+        MessageDescriptor message = MessageGenerator.buildMessage(MessageGenerator.nextString(),
+                updated.getMail(),
+                MessageGenerator.nextMail(),
+                user.toString());
+        reactor.notify("mail.execute", Event.wrap(message));
+
+        // Update message count
+        updated = users.save(updated.setMessageCount(user.getMessageCount() + 1));
 
         // Return result
         return "User " + updated.getMail() + " has been registered.";
@@ -54,6 +69,13 @@ public class MailController {
 
         // Delete user
         users.delete(user);
+
+        // Send un-registration notification
+        MessageDescriptor message = MessageGenerator.buildMessage(MessageGenerator.nextString(),
+                user.getMail(),
+                MessageGenerator.nextMail(),
+                user.toString());
+        reactor.notify("mail.execute", Event.wrap(message));
 
         // Return result
         return "User " + user.getMail() + " has been deleted.";
