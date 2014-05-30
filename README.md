@@ -10,107 +10,30 @@
     * How can it help?
 ##Topic 3 : Demo 1 (Echo service) 
     Step 1 : GET
-
-###Step 1 : create au.com.gumtree.ms.workshop.domain package and User class 
-
-<pre>
-package au.com.gumtree.ms.workshop.domain;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-@Entity
-public class User {
-    @Id
-    @GeneratedValue
-    private Long   id;
-    @Column(nullable = false)
-    private String mail;
-
-    protected User() {
-    }
-
-    public User(String mail) {
-        this.mail = mail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + mail + '\'' +
-                '}';
-    }
-}
-</pre>
+    Step 2 : POST
 
 
-###Step 2 : create au.com.gumtree.ms.workshop.repository package and UserRepository class
+###Step 1 : update the controller class 
 
 <pre>
-package au.com.gumtree.ms.workshop.repository;
-
-import au.com.gumtree.ms.workshop.domain.User;
-import org.springframework.data.repository.CrudRepository;
-
-public interface UserRepository extends CrudRepository<User, Long> {
-}
-</pre>
-
-###Step 3 : create resources directory under main
-###Step 4 : create application.properties under resources directory
-
-<pre>
-spring.jpa.hibernate.ddl-auto: create-drop
-</pre>
-
-###Step 5 : create import.sql under resources directory
-<pre>
-insert into user(id, mail) values (1, 'mdarapour@ebay.com')
-</pre>
-
-###Step 6 : change the contoller class
-<pre>
-package au.com.gumtree.ms.workshop.web;
-
-import au.com.gumtree.ms.workshop.domain.User;
-import au.com.gumtree.ms.workshop.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-/**
- * @author mdarapour
- */
-@RestController
-public class MailController {
-    private final UserRepository users;
-
-    @Autowired
-    public MailController(UserRepository users) {
-        this.users = users;
-    }
-    
-
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/user", method = RequestMethod.POST, produces = "text/plain")
     @ResponseBody
-    public User get(@PathVariable Long id) {
-        // Retrieve user by id
-        return users.findOne(id);
+    public String add(@RequestBody User user) {
+        // Save user
+        User updated = users.save(user);
+
+        // Return result
+        return "User " + updated.getMail() + " has been registered.";
     }
-}
 </pre>
 
-###Step 6 : call the API
+###Step 2 : start the boot app
+###Step 3 : create a new user
 <pre>
-curl -X GET -H "Content-Type: application/json" http://localhost:8080/user/1
+curl -X POST -H "Content-Type: application/json" http://localhost:8080/user -d '{"id":2,"mail":"mail2@ebay.com"}'
+</pre>
+
+###Step 4 : retrieve the user
+<pre>
+curl -X GET -H "Content-Type: application/json" http://localhost:8080/user/2
 </pre>
