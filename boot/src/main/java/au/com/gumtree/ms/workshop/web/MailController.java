@@ -5,6 +5,8 @@ import au.com.gumtree.ms.workshop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 /**
  * @author mdarapour
  */
@@ -33,5 +35,20 @@ public class MailController {
 
         // Return result
         return "User " + updated.getMail() + " has been registered.";
+    }
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE, produces = "text/plain")
+    @ResponseBody
+    public String delete(@PathVariable Long id) {
+        // Retrieve user by id
+        User user = users.findOne(id);
+        if(Objects.isNull(user))
+            return "User id '"+id+"' not found.";
+
+        // Delete user
+        users.delete(user);
+
+        // Return result
+        return "User " + user.getMail() + " has been deleted.";
     }
 }
