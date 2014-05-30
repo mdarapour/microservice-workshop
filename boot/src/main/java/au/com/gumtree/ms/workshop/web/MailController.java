@@ -24,4 +24,14 @@ public class MailController {
         // Retrieve user by id
         return users.findOne(id);
     }
+
+    @RequestMapping(value = "/user", method = RequestMethod.POST, produces = "text/plain")
+    @ResponseBody
+    public String add(@RequestBody User user) {
+        // Save user
+        User updated = users.save(user);
+
+        // Return result
+        return "User " + updated.getMail() + " has been registered.";
+    }
 }
