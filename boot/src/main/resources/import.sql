@@ -1,1 +1,1 @@
-insert into user(id, mail) values (1, 'mdarapour@ebay.com')
+insert into user(id, mail, message_count) values (1, 'mdarapour@ebay.com', 0)

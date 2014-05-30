@@ -15,6 +15,8 @@ public class User {
     private Long   id;
     @Column(nullable = false)
     private String mail;
+    @Column
+    private Long   messageCount;
 
     protected User() {
     }
@@ -31,11 +33,21 @@ public class User {
         return mail;
     }
 
+    public Long getMessageCount() {
+        return messageCount;
+    }
+
+    public User setMessageCount(Long messageCount) {
+        this.messageCount = messageCount;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", name='" + mail + '\'' +
+                ", messageCount=" + messageCount +
                 '}';
     }
 }
