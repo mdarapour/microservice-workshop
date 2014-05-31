@@ -10,9 +10,10 @@
     * How can it help?
 ##Topic 3 : Demo (Mail service) 
     Step 1 : GET
-    Step 2 : PUT
-    Step 3 : POST
-    Step 4 : DELETE
+    Step 2 : POST
+    Step 3 : DELETE
+    Step 4 : PUT
+    Step 5 : Send Notification
 ##Topic 4 : Pros & Cons
     * Microservice Group
     
