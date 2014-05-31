@@ -26,3 +26,5 @@ curl -X DELETE -H "Content-Type: application/json" http://localhost:8080/user/1
 curl -X PUT -H "Content-Type: application/json" http://localhost:8080/user/1/to/buyer@email.com/hi/hello
 curl -X POST -H "Content-Type: application/json" http://localhost:8080/shutdown
 ```
+
+<p><a href="https://slides.com/mattdarapour/microservices" title="Slides">Slides</a></p>
